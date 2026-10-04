@@ -1,0 +1,55 @@
+/* Animaciones suaves del sitio. Solo transform y opacity (más sombra en hover de botones).
+   Todo depende de html.js-anim, que añade animations.js solo si el JS cargó,
+   no hay prefers-reduced-motion y la URL no trae ?captura=1. */
+
+@keyframes anim-rise{from{opacity:0;transform:translate3d(0,20px,0)}to{opacity:1;transform:none}}
+@keyframes anim-rise-hero{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:none}}
+@keyframes anim-pulse{0%{opacity:.55;transform:scale(1)}100%{opacity:0;transform:scale(1.06)}}
+
+@media (prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth}
+  html.captura{scroll-behavior:auto}
+
+  /* Estado oculto: solo mientras el JS está activo y el elemento aún no entra */
+  html.js-anim [data-reveal]:not(.is-in){opacity:0;transition:none}
+  html.js-anim [data-reveal].is-in{
+    animation:anim-rise .7s cubic-bezier(.22,.61,.36,1) backwards;
+    animation-delay:var(--anim-delay,0ms);
+  }
+  html.js-anim [data-reveal="hero"].is-in{animation-name:anim-rise-hero;animation-duration:.8s}
+  html.js-anim [data-reveal].is-instant{animation:none}
+
+  /* Pulso suave del botón de WhatsApp (móvil), se detiene tras 3 ciclos */
+  html.js-anim #view-mobile #m-inicio a[href^="https://wa.me"]{position:relative}
+  html.js-anim #view-mobile #m-inicio a[href^="https://wa.me"]::after{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    border:2px solid rgba(0,106,97,.6);opacity:0;
+    animation:anim-pulse 1.8s ease-out 1.6s 3;
+  }
+}
+
+/* Hover (solo dispositivos con puntero) */
+@media (prefers-reduced-motion:no-preference) and (hover:hover){
+  html.js-anim a[href^="https://wa.me"][class*="rounded"],
+  html.js-anim a[href^="tel:"][class*="rounded"]{
+    transition:transform .3s ease,box-shadow .3s ease,background-color .3s ease,color .3s ease;
+  }
+  html.js-anim a[href^="https://wa.me"][class*="rounded"]:hover,
+  html.js-anim a[href^="tel:"][class*="rounded"]:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 22px -8px rgba(0,106,97,.38);
+  }
+
+  /* Tarjetas de confianza (las de servicios ya traen su propio hover) */
+  html.js-anim #view-desktop #confianza > div > .grid > div{
+    transition:transform .35s ease,box-shadow .35s ease;
+  }
+  html.js-anim #view-desktop #confianza > div > .grid > div:hover{
+    transform:translateY(-4px);
+    box-shadow:0 14px 28px -10px rgba(15,40,71,.14);
+  }
+
+  /* Foto del doctor: zoom máximo 1.03 (recortada por su contenedor) */
+  html.js-anim #view-desktop #inicio .overflow-hidden > img{transition:transform .6s ease}
+  html.js-anim #view-desktop #inicio .overflow-hidden:hover > img{transform:scale(1.03)}
+}
